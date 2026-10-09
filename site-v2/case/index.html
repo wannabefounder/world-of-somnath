@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Case study — Harsh Vishwakarma</title>
+<meta name="description" content="A case study by Harsh Vishwakarma, design generalist in Bengaluru.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/v2.css">
+</head>
+<body>
+<header class="bar" id="bar"><div class="wrap">
+  <a class="logo" href="/work"><span class="plate">Harsh Vishwakarma</span><span class="sub">← All work</span></a>
+  <nav>
+    <a href="/work#cases" class="hide-sm">Case studies</a>
+    <a class="pill ink" href="/resume/Harsh-Vishvakarma-Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+  </nav>
+</div></header>
+<main id="main"></main>
+<script src="/assets/v2.js"></script>
+<script src="/assets/cases.js"></script>
+<script>
+(() => {
+  const CASES = window.CASES;
+  const parts = location.pathname.split('/').filter(Boolean);
+  const want = (parts[0] === 'case' && parts[1]) || new URLSearchParams(location.search).get('c') || location.hash.slice(1);
+  let i = CASES.findIndex(c => c.slug === want);
+  if (i < 0) { location.replace('/work#cases'); return; }
+  const c = CASES[i], next = CASES[(i + 1) % CASES.length];
+  document.title = c.title + ' — Harsh Vishwakarma';
+  document.querySelector('meta[name=description]').setAttribute('content', c.line);
+  document.getElementById('main').innerHTML = window.WOS.renderCase(c, next);
+  // dark top bar while over a dark hero or dark section
+  const bar = document.getElementById('bar');
+  const lum = hex => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) / 255; };
+  const darkBg = lum(c.bg) < .45;
+  const zones = () => [...document.querySelectorAll('.c-hero, .c-sec.dark, .next')];
+  const upd = () => {
+    const y = 70; let dark = false;
+    for (const z of zones()) { const r = z.getBoundingClientRect(); if (r.top <= y && r.bottom > y) { dark = z.classList.contains('c-hero') ? darkBg : true; break; } }
+    bar.classList.toggle('dark', dark);
+  };
+  addEventListener('scroll', upd, { passive: true }); upd();
+  window.WOS.initMotion(document);
+})();
+</script>
+</body>
+</html>

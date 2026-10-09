@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>World of Somnath — under construction</title>
+<meta name="description" content="Harsh Vishwakarma is building a playable Bengaluru street here. Until it opens, the work is ready to see.">
+<meta property="og:title" content="World of Somnath — under construction">
+<meta property="og:description" content="A playable Bengaluru street is being built here. The work is ready now.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/v2.css">
+<style>
+  /* time-of-day palettes (set from live Bengaluru time) */
+  body { --sky1: #ffd9a0; --sky2: #fff3dc; --far: #e7c9a3; --mid: #d9b48a; --bld: #c7a07a; --bld2: #b88f6b; --win: #8f6b4c; --winlit: #ffe08a; --sun: #ffb43a; --ground: #2a2823; --text: #17150f; --haze: rgba(255,255,255,.35); }
+  body[data-tod="dusk"] { --sky1: #f08a5d; --sky2: #ffcf8f; --far: #b9796b; --mid: #9c6457; --bld: #84584c; --bld2: #73493f; --win: #5a3a33; --sun: #ff7a3a; --haze: rgba(255,200,160,.25); }
+  body[data-tod="night"] { --sky1: #0f1630; --sky2: #2a2f55; --far: #23284a; --mid: #1c2040; --bld: #262a4c; --bld2: #1f2342; --win: #2e335a; --sun: #f4efd8; --haze: rgba(120,140,255,.08); --text: #f4f1e8; }
+  html, body { height: 100%; }
+  body { overflow-x: hidden; }
+  .site { position: relative; height: 100svh; min-height: 620px; overflow: hidden; background: linear-gradient(var(--sky1), var(--sky2) 70%); transition: background 1s; }
+  .site svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .copy { position: absolute; z-index: 5; top: calc(58px + env(safe-area-inset-top, 0px) + clamp(18px, 5vh, 56px)); left: 0; right: 0; color: var(--text); pointer-events: none; }
+  .copy .wrap > * { pointer-events: auto; }
+  @media (max-width: 760px) { .site { display: flex; flex-direction: column; height: auto; min-height: 100svh; padding-top: calc(58px + env(safe-area-inset-top, 0px)); } .copy { position: relative; top: 0; padding-top: 22px; order: 0; } .site svg.scene { position: relative; inset: auto; flex: 1; min-height: 480px; height: auto; order: 1; } }
+  .copy h1 { font-size: clamp(54px, 9.6vw, 150px); margin-top: 14px; }
+  .copy h1 .board { transform: rotate(-1.5deg); }
+  .copy p { font-size: clamp(16px, 1.6vw, 20px); max-width: 34ch; margin-top: 18px; line-height: 1.45; font-weight: 500; }
+  .copy .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 22px; }
+  body[data-tod="night"] .copy .pill.line { color: #f4f1e8; }
+  .status { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 0 0 rgba(245,196,0,.6); animation: ping 1.6s infinite; display: inline-block; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 10px rgba(245,196,0,0); } 100% { box-shadow: 0 0 0 0 rgba(245,196,0,0); } }
+
+  /* scene motion */
+  .cloud { animation: drift linear infinite; }
+  @keyframes drift { from { transform: translateX(-300px); } to { transform: translateX(1900px); } }
+  .floor { opacity: 0; transform: translateY(30px); animation: rise .9s cubic-bezier(.16,1,.3,1) forwards; transform-box: fill-box; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .trolley { animation: trolley 9s ease-in-out infinite; }
+  @keyframes trolley { 0%, 8% { transform: translateX(0); } 45%, 55% { transform: translateX(-250px); } 92%, 100% { transform: translateX(0); } }
+  .cable { transform-origin: 0 0; transform-box: fill-box; animation: cable 9s ease-in-out infinite; }
+  @keyframes cable { 0%, 8% { transform: scaleY(1); } 25% { transform: scaleY(.55); } 45%, 55% { transform: scaleY(.55); } 75% { transform: scaleY(1); } 100% { transform: scaleY(1); } }
+  .load { animation: load 9s ease-in-out infinite; }
+  @keyframes load { 0%, 8% { transform: translateY(0); } 25% { transform: translateY(-85px); } 45%, 55% { transform: translateY(-85px); } 75% { transform: translateY(0); } 100% { transform: translateY(0); } }
+  .swing { transform-origin: 50% 0; transform-box: fill-box; animation: swing 3.2s ease-in-out infinite alternate; }
+  @keyframes swing { from { transform: rotate(-3.5deg); } to { transform: rotate(3.5deg); } }
+  .trolley2 { animation: trolley2 11s ease-in-out infinite; }
+  @keyframes trolley2 { 0%, 10% { transform: translateX(0); } 50% { transform: translateX(140px); } 90%, 100% { transform: translateX(0); } }
+  .beacon { animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: .15; } }
+  .spark { transform-box: fill-box; transform-origin: center; animation: spark 1.4s ease-out infinite; }
+  @keyframes spark { 0% { opacity: 0; transform: scale(.2); } 10% { opacity: 1; transform: scale(1); } 40% { opacity: 0; transform: scale(1.6) translateY(8px); } 100% { opacity: 0; } }
+  .lane { animation: lane 1.2s linear infinite; }
+  @keyframes lane { to { transform: translateX(-80px); } }
+  .auto { animation: autoDrive 14s linear infinite; }
+  @keyframes autoDrive { from { transform: translateX(-200px); } to { transform: translateX(1800px); } }
+  .wheel { transform-box: fill-box; transform-origin: center; animation: spin .6s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .drum { transform-box: fill-box; transform-origin: center; animation: spin 3s linear infinite; }
+  .bird { animation: fly 22s linear infinite; }
+  @keyframes fly { from { transform: translate(-100px, 0); } to { transform: translate(1800px, -60px); } }
+  .flap { transform-box: fill-box; transform-origin: center; animation: flap .5s ease-in-out infinite alternate; }
+  @keyframes flap { to { transform: scaleY(-.4); } }
+  .win-lit { opacity: 0; transition: opacity .6s; }
+  body[data-tod="night"] .win-lit, body[data-tod="dusk"] .win-lit { opacity: 1; }
+  .win-lit rect { animation: flick 6s steps(1) infinite; }
+  @keyframes flick { 0%, 92% { opacity: 1; } 93%, 95% { opacity: .3; } }
+  .layer { transition: transform .25s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .site * { animation: none !important; } .floor { opacity: 1; transform: none; } }
+
+  /* site plan */
+  .plan { background: #173a7a; color: #e9f0ff; position: relative; padding-block: clamp(70px, 12vh, 130px); background-image: linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px); background-size: 32px 32px; }
+  .plan h2 { font-size: clamp(48px, 8vw, 110px); }
+  .plan .intro { max-width: 46ch; margin-top: 16px; opacity: .85; font-size: 18px; }
+  .phases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 44px; }
+  .phase { border: 1.5px dashed rgba(233,240,255,.55); border-radius: 18px; padding: 24px; display: grid; gap: 10px; align-content: start; background: rgba(10,25,60,.35); }
+  .phase .label { opacity: .7; }
+  .phase h3 { font-size: 26px; letter-spacing: -.02em; }
+  .phase p { opacity: .8; font-size: 15px; }
+  .phase .bar2 { height: 10px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 8px; }
+  .phase .bar2 i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(-45deg, var(--yellow) 0 8px, #17150f 8px 16px); border-radius: 99px; transition: width 1.6s cubic-bezier(.16,1,.3,1); }
+  .phase.in .bar2 i { width: var(--p); }
+  .phase.open { border-style: solid; border-color: var(--yellow); }
+  .phase .pill { justify-self: start; margin-top: 6px; }
+  @media (max-width: 860px) { .phases { grid-template-columns: minmax(0, 1fr); } }
+  .foot2 { background: var(--ink); color: var(--paper); padding-block: 26px; font-size: 13px; }
+  .foot2 .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; opacity: .8; }
+  .foot2 a { color: var(--yellow); }
+</style>
+</head>
+<body data-tod="day">
+<header class="bar"><div class="wrap">
+  <a class="logo" href="/"><span class="plate">World of Somnath</span><span class="sub" id="clock">Bengaluru</span></a>
+  <nav>
+    <a href="#plan" class="hide-sm">Site plan</a>
+    <a class="pill ink" href="/work">See the work <span class="arr">→</span></a>
+  </nav>
+</div></header>
+
+<section class="site" id="site">
+  <svg class="scene" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <pattern id="wins" width="26" height="30" patternUnits="userSpaceOnUse"><rect x="6" y="8" width="12" height="14" rx="1.5" fill="var(--win)"/></pattern>
+      <pattern id="wins2" width="22" height="26" patternUnits="userSpaceOnUse"><rect x="5" y="6" width="10" height="12" rx="1" fill="var(--win)" opacity=".8"/></pattern>
+      <pattern id="haz" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="14" height="28" fill="#f5c400"/><rect x="14" width="14" height="28" fill="#17150f"/></pattern>
+      <pattern id="lattice" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M0 0L12 12M12 0L0 12" stroke="#d48a00" stroke-width="1.6"/></pattern>
+      <pattern id="scaf" width="40" height="44" patternUnits="userSpaceOnUse"><path d="M0 0V44M0 0H40M0 0L40 44" stroke="#8a6a3a" stroke-width="2" fill="none" opacity=".75"/></pattern>
+      <linearGradient id="hazeg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--haze)" stop-opacity="0"/><stop offset="1" stop-color="var(--haze)"/></linearGradient>
+    </defs>
+
+    <!-- sun / moon -->
+    <g class="layer" data-depth="4"><circle cx="760" cy="150" r="64" fill="var(--sun)" opacity=".9"/></g>
+
+    <!-- clouds -->
+    <g opacity=".85">
+      <g class="cloud" style="animation-duration:95s;animation-delay:-30s"><path d="M80 150c0-20 18-34 38-30 8-18 34-24 50-10 16-6 34 4 36 22 14 2 22 12 22 22H80z" fill="#fff" opacity=".8"/></g>
+      <g class="cloud" style="animation-duration:120s;animation-delay:-80s"><path d="M80 90c0-16 14-26 30-24 6-14 26-18 38-8 12-4 26 4 28 16 10 2 16 10 16 16H80z" fill="#fff" opacity=".65"/></g>
+      <g class="cloud" style="animation-duration:140s;animation-delay:-10s"><path d="M80 250c0-12 10-20 22-18 5-10 20-14 30-6 9-3 20 3 21 12 8 1 12 7 12 12H80z" fill="#fff" opacity=".55"/></g>
+    </g>
+
+    <!-- birds -->
+    <g class="bird" style="animation-delay:-4s"><g transform="translate(0 180)"><path class="flap" d="M0 0q8 -8 16 0q8 -8 16 0" stroke="var(--text)" stroke-width="2.4" fill="none" opacity=".6"/></g></g>
+    <g class="bird" style="animation-delay:-12s;animation-duration:28s"><g transform="translate(0 230) scale(.7)"><path class="flap" d="M0 0q8 -8 16 0q8 -8 16 0" stroke="var(--text)" stroke-width="2.4" fill="none" opacity=".5"/></g></g>
+
+    <!-- far skyline -->
+    <g class="layer" data-depth="8">
+      <path d="M0 640V520h60v-40h50v60h40V460h70v80h30v-30h60v110h40V420h30l10-20 10 20h30v220h40V500h80v140h50V470h60v-40h40v210h60V510h70v130h40V440h90v200h60V490h50v150h70V530h80v110h60V470h70v170h80V560h60v80H1600V640z" fill="var(--far)"/>
+      <!-- background crane -->
+      <g transform="translate(250 0)">
+        <rect x="0" y="300" width="14" height="340" fill="url(#lattice)" opacity=".7"/>
+        <rect x="-60" y="292" width="260" height="10" fill="#c98a1a" opacity=".75"/>
+        <rect x="-60" y="282" width="40" height="22" fill="#9a6a20" opacity=".75"/>
+        <g class="trolley2"><rect x="40" y="302" width="16" height="8" fill="#555"/><line x1="48" y1="310" x2="48" y2="400" stroke="#444" stroke-width="1.5"/><rect x="34" y="400" width="28" height="18" fill="#8a8a8a"/></g>
+        <circle class="beacon" cx="7" cy="286" r="4" fill="#ff3b2f"/>
+      </g>
+    </g>
+
+    <!-- mid buildings -->
+    <g class="layer" data-depth="14">
+      <rect x="40" y="470" width="170" height="250" fill="var(--mid)"/><rect x="40" y="470" width="170" height="250" fill="url(#wins2)"/>
+      <rect x="230" y="420" width="120" height="300" fill="var(--bld2)"/><rect x="230" y="420" width="120" height="300" fill="url(#wins)"/>
+      <rect x="1180" y="430" width="150" height="290" fill="var(--bld2)"/><rect x="1180" y="430" width="150" height="290" fill="url(#wins)"/>
+      <rect x="1350" y="500" width="210" height="220" fill="var(--mid)"/><rect x="1350" y="500" width="210" height="220" fill="url(#wins2)"/>
+      <!-- lit windows (dusk/night) -->
+      <g class="win-lit" fill="var(--winlit)">
+        <rect x="241" y="436" width="12" height="14"/><rect x="293" y="496" width="12" height="14" style="animation-delay:-2s"/><rect x="267" y="586" width="12" height="14"/><rect x="319" y="646" width="12" height="14" style="animation-delay:-3s"/>
+        <rect x="1197" y="468" width="12" height="14"/><rect x="1249" y="528" width="12" height="14" style="animation-delay:-1s"/><rect x="1301" y="618" width="12" height="14"/><rect x="1223" y="678" width="12" height="14"/>
+        <rect x="55" y="500" width="10" height="12"/><rect x="143" y="578" width="10" height="12"/><rect x="1385" y="560" width="10" height="12" style="animation-delay:-4s"/><rect x="1473" y="612" width="10" height="12"/>
+      </g>
+    </g>
+
+    <!-- THE building under construction -->
+    <g class="layer" data-depth="20">
+      <g id="tower" transform="translate(380 0)">
+        <!-- floors rise on load, ground first -->
+        <g class="floors"></g>
+        <!-- scaffolding on the top floors -->
+        <rect x="560" y="236" width="300" height="176" fill="url(#scaf)" class="floor" style="animation-delay:2.6s"/>
+        <!-- formwork + rebar on the roof -->
+        <g class="floor" style="animation-delay:2.9s">
+          <rect x="575" y="214" width="270" height="22" fill="#9c8a6c"/>
+          <g stroke="#6b5a44" stroke-width="3">
+            <line x1="590" y1="214" x2="590" y2="176"/><line x1="640" y1="214" x2="640" y2="168"/><line x1="690" y1="214" x2="690" y2="180"/><line x1="740" y1="214" x2="740" y2="170"/><line x1="790" y1="214" x2="790" y2="178"/><line x1="830" y1="214" x2="830" y2="172"/>
+          </g>
+          <!-- welding sparks -->
+          <g fill="#ffcf3a"><circle class="spark" cx="700" cy="206" r="5"/><circle class="spark" cx="705" cy="200" r="3" style="animation-delay:.2s"/><circle class="spark" cx="695" cy="203" r="3" style="animation-delay:.45s"/></g>
+          <g fill="#ffcf3a"><circle class="spark" cx="612" cy="206" r="4" style="animation-delay:.8s"/><circle class="spark" cx="618" cy="200" r="2.5" style="animation-delay:1s"/></g>
+          <!-- safety net banner -->
+          <rect x="605" y="240" width="210" height="34" fill="#1f8a4c"/>
+          <text x="710" y="263" text-anchor="middle" font-family="Geist Mono, monospace" font-weight="600" font-size="14" fill="#fff" letter-spacing="2">FLOOR 07 · IN PROGRESS</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- tower crane (foreground) -->
+    <g class="layer" data-depth="24">
+      <g transform="translate(1390 0)">
+        <rect x="0" y="150" width="30" height="570" fill="url(#lattice)"/>
+        <rect x="-2" y="150" width="34" height="570" fill="none" stroke="#d48a00" stroke-width="3"/>
+        <!-- cab -->
+        <rect x="-8" y="150" width="46" height="34" rx="4" fill="#f5c400" stroke="#17150f" stroke-width="2"/>
+        <rect x="0" y="158" width="18" height="14" fill="#2f3a48"/>
+        <!-- apex -->
+        <path d="M2 150L15 70L28 150" fill="none" stroke="#d48a00" stroke-width="5"/>
+        <!-- jib -->
+        <rect x="-430" y="132" width="460" height="18" fill="url(#lattice)"/>
+        <rect x="-430" y="132" width="460" height="18" fill="none" stroke="#d48a00" stroke-width="3"/>
+        <!-- counter jib + weights -->
+        <rect x="30" y="132" width="170" height="18" fill="url(#lattice)"/><rect x="30" y="132" width="170" height="18" fill="none" stroke="#d48a00" stroke-width="3"/>
+        <rect x="140" y="150" width="56" height="44" fill="#6b6b6b" stroke="#17150f" stroke-width="2"/>
+        <line x1="15" y1="72" x2="-420" y2="132" stroke="#8a6a3a" stroke-width="2"/><line x1="15" y1="72" x2="190" y2="132" stroke="#8a6a3a" stroke-width="2"/>
+        <circle class="beacon" cx="15" cy="66" r="6" fill="#ff3b2f"/>
+        <!-- trolley + hook + load -->
+        <g class="trolley">
+          <rect x="-90" y="150" width="34" height="12" fill="#17150f"/>
+          <line class="cable" x1="-73" y1="162" x2="-73" y2="430" stroke="#17150f" stroke-width="2.4"/>
+          <g class="load">
+            <g class="swing">
+              <line x1="-73" y1="428" x2="-73" y2="446" stroke="#17150f" stroke-width="3"/>
+              <path d="M-73 446 L-150 470 M-73 446 L4 470" stroke="#17150f" stroke-width="2"/>
+              <rect x="-170" y="468" width="194" height="70" rx="5" fill="#f5c400" stroke="#17150f" stroke-width="4"/>
+              <circle cx="-160" cy="478" r="3" fill="#17150f"/><circle cx="14" cy="478" r="3" fill="#17150f"/>
+              <text x="-73" y="500" text-anchor="middle" font-family="Anybody, sans-serif" font-stretch="62%" font-weight="900" font-size="26" fill="#17150f">WORLD OF</text>
+              <text x="-73" y="528" text-anchor="middle" font-family="Anybody, sans-serif" font-stretch="62%" font-weight="900" font-size="26" fill="#17150f">SOMNATH</text>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+
+    <!-- ground haze -->
+    <rect x="0" y="560" width="1600" height="180" fill="url(#hazeg)"/>
+
+    <!-- hoarding fence -->
+    <g class="layer" data-depth="30">
+      <rect x="0" y="690" width="1600" height="16" fill="url(#haz)"/>
+      <g id="hoard"></g>
+      <rect x="0" y="790" width="1600" height="10" fill="#17150f"/>
+      <!-- road sign -->
+      <g transform="translate(1440 600)"><rect x="8" y="0" width="5" height="200" fill="#3b3b3b"/><rect x="-46" y="0" width="112" height="40" rx="3" fill="#1f8a4c" stroke="#fff" stroke-width="3"/><text x="10" y="27" text-anchor="middle" font-family="Anybody, sans-serif" font-stretch="70%" font-weight="800" font-size="20" fill="#fff">8TH MAIN</text></g>
+      <!-- cement mixer -->
+      <g transform="translate(120 712)">
+        <rect x="0" y="40" width="150" height="26" rx="4" fill="#d9381e"/><rect x="110" y="14" width="46" height="52" rx="6" fill="#d9381e"/><rect x="118" y="22" width="30" height="18" fill="#2f3a48"/>
+        <ellipse cx="55" cy="32" rx="52" ry="30" fill="#e9e3d6" stroke="#17150f" stroke-width="3"/>
+        <g class="drum"><path d="M15 32 Q55 0 95 32 Q55 64 15 32" fill="none" stroke="#f5c400" stroke-width="6"/></g>
+        <circle class="wheel" cx="30" cy="70" r="13" fill="#17150f"/><circle class="wheel" cx="130" cy="70" r="13" fill="#17150f"/>
+      </g>
+    </g>
+
+    <!-- road -->
+    <rect x="0" y="800" width="1600" height="100" fill="var(--ground)"/>
+    <g class="lane"><g id="lanes"></g></g>
+    <!-- auto rickshaw -->
+    <g class="auto"><g transform="translate(0 776) scale(1.25)">
+      <path d="M14 10c0-4 3-7 7-7h30c9 0 17 6 20 15l3 10v10H10V18z" fill="#1f8a4c"/>
+      <path d="M10 26h66v12H10z" fill="#f5c400"/>
+      <path d="M22 9h22v15H18z" fill="#2f3a48" opacity=".85"/><path d="M50 9h4c6 0 11 5 13 11l1 4H50z" fill="#2f3a48" opacity=".85"/>
+      <g class="wheel"><circle cx="20" cy="42" r="8" fill="#17150f"/><rect x="18" y="35" width="4" height="14" fill="#b9b2a6"/></g>
+      <g class="wheel"><circle cx="64" cy="42" r="8" fill="#17150f"/><rect x="62" y="35" width="4" height="14" fill="#b9b2a6"/></g>
+      <rect x="72" y="28" width="5" height="4" rx="1" fill="#fff3b0"/>
+    </g></g>
+  </svg>
+
+  <div class="copy"><div class="wrap">
+    <div class="status"><span class="sticker y"><span class="dot"></span> Under construction</span><span class="sticker" style="--r:2deg">Site no. 01 · 8th Main</span></div>
+    <h1 class="display">World of<br><span class="board">Somnath</span></h1>
+    <p>A playable Bengaluru street is being built here by Harsh Vishwakarma. The city isn't open yet. The work is.</p>
+    <div class="cta">
+      <a class="pill yel" href="/work">See the work <span class="arr">→</span></a>
+      <a class="pill line" href="/resume/Harsh-Vishvakarma-Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+    </div>
+  </div></div>
+</section>
+
+<section class="plan" id="plan">
+  <div class="wrap">
+    <span class="sticker y">Site plan</span>
+    <h2 class="display" style="margin-top:18px">What's going<br>up here.</h2>
+    <p class="intro">Built in phases, like everything else in Bengaluru. Phase one is open.</p>
+    <div class="phases">
+      <div class="phase open rv" style="--p:100%"><span class="label">Phase 01 · Open</span><h3>Work &amp; case studies</h3><p>Ten case studies and the full archive of product, brand, motion and film work.</p><div class="bar2"><i></i></div><a class="pill yel" href="/work">Walk in <span class="arr">→</span></a></div>
+      <div class="phase rv" style="--p:38%;--d:.08s"><span class="label">Phase 02 · Under construction</span><h3>The street</h3><p>A 3D Bengaluru locality on live IST time: hail an auto, visit each project's building, meet the companion in every tower.</p><div class="bar2"><i></i></div></div>
+      <div class="phase rv" style="--p:10%;--d:.16s"><span class="label">Phase 03 · Planned</span><h3>Life on the street</h3><p>Whispers left by visitors, achievements, weather and seasons, and an auto race with a leaderboard.</p><div class="bar2"><i></i></div></div>
+    </div>
+  </div>
+</section>
+<footer class="foot2"><div class="wrap"><span>© 2026 Harsh Vishwakarma · <a href="mailto:harshnaamhaimeraa@gmail.com">harshnaamhaimeraa@gmail.com</a></span><span>Scene changes with the time in Bengaluru.</span></div></footer>
+
+<script src="/assets/v2.js"></script>
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs) => { const el = document.createElementNS(NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); return el; };
+  // floors: 8 storeys, each 52px, rising one by one
+  const fl = document.querySelector('.floors');
+  for (let i = 0; i < 9; i++) {
+    const y = 690 - (i + 1) * 52;
+    const g = mk('g', { class: 'floor', style: `animation-delay:${.25 + i * .22}s` });
+    g.appendChild(mk('rect', { x: 560, y, width: 300, height: 52, fill: i < 6 ? 'var(--bld)' : '#b9b2a6' }));
+    g.appendChild(mk('rect', { x: 560, y: y + 44, width: 300, height: 8, fill: '#8f8676' }));
+    if (i < 6) g.appendChild(mk('rect', { x: 570, y: y + 6, width: 280, height: 36, fill: 'url(#wins)' }));
+    else for (let c = 0; c < 6; c++) g.appendChild(mk('rect', { x: 574 + c * 48, y: y + 4, width: 10, height: 40, fill: '#9c9384' }));
+    fl.appendChild(g);
+  }
+  // lit windows on finished floors at night
+  const lit = document.querySelector('.win-lit');
+  [[2, 1], [4, 3], [1, 6], [5, 5], [3, 8]].forEach(([f, c], k) => lit.appendChild(mk('rect', { x: 950 + c * 26 + 6, y: 690 - (f + 1) * 52 + 14, width: 12, height: 14, style: `animation-delay:-${k}s` })));
+  // hoarding panels
+  const hoard = document.getElementById('hoard');
+  const msgs = ['WORLD OF SOMNATH', 'COMING SOON', 'WORK IN PROGRESS', 'HARSH AT WORK', 'PHASE 01 OPEN', 'MIND THE AUTO'];
+  for (let i = 0; i < 12; i++) {
+    const x = i * 140, alt = i % 2;
+    hoard.appendChild(mk('rect', { x, y: 706, width: 140, height: 84, fill: alt ? '#17150f' : '#f4f1e8', stroke: '#17150f', 'stroke-width': 2 }));
+    const t = mk('text', { x: x + 70, y: 756, 'text-anchor': 'middle', 'font-family': 'Anybody, sans-serif', 'font-stretch': '62%', 'font-weight': 900, 'font-size': 19, fill: alt ? '#f5c400' : '#17150f' });
+    t.textContent = msgs[i % msgs.length]; hoard.appendChild(t);
+  }
+  // lane dashes
+  const lanes = document.getElementById('lanes');
+  for (let x = 0; x < 1700; x += 80) lanes.appendChild(mk('rect', { x, y: 848, width: 44, height: 5, fill: '#f4f1e8', opacity: .55 }));
+
+  // live Bengaluru time → time of day
+  const clock = document.getElementById('clock');
+  const f = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true });
+  const hourIST = () => +new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', hour12: false }).format(new Date());
+  const tick = () => {
+    clock.textContent = 'Bengaluru · ' + f.format(new Date()).toUpperCase();
+    const h = hourIST();
+    document.body.dataset.tod = h >= 6 && h < 17 ? 'day' : (h >= 17 && h < 19 ? 'dusk' : 'night');
+  };
+  tick(); setInterval(tick, 30000);
+
+  // on phones, frame the construction site instead of the empty middle
+  const svg = document.querySelector('svg.scene');
+  const frame = () => { const narrow = innerWidth < 760; svg.setAttribute('viewBox', narrow ? '820 120 780 780' : '0 0 1600 900'); };
+  frame(); addEventListener('resize', frame);
+
+  // depth parallax with pointer + scroll
+  const layers = [...document.querySelectorAll('.layer')];
+  let mx = 0, my = 0;
+  addEventListener('pointermove', e => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; move(); });
+  addEventListener('scroll', move, { passive: true });
+  function move() { const s = scrollY; layers.forEach(l => { const d = +l.dataset.depth; l.style.transform = `translate(${(-mx * d).toFixed(1)}px, ${(-my * d * .4 + s * d * .012).toFixed(1)}px)`; }); }
+
+  window.WOS.initMotion(document);
+  // phase bars fill when seen
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: .4 });
+  document.querySelectorAll('.phase').forEach(p => io.observe(p));
+})();
+</script>
+</body>
+</html>

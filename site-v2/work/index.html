@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harsh Vishwakarma — Work</title>
+<meta name="description" content="Harsh Vishwakarma, design generalist in Bengaluru. Case studies in product design, brand, motion and film, plus the full archive.">
+<meta property="og:title" content="Harsh Vishwakarma — Work">
+<meta property="og:description" content="Case studies in product design, brand, motion and film.">
+<meta property="og:image" content="/media/wl/andamen-popup.webp">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/assets/v2.css">
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="logo" href="/"><span class="plate">Harsh Vishwakarma</span><span class="sub">Design generalist · Bengaluru</span></a>
+  <nav>
+    <a href="#cases" class="hide-sm">Case studies</a>
+    <a href="#archive" class="hide-sm">Archive</a>
+    <a class="pill ink" href="/resume/Harsh-Vishvakarma-Resume.pdf" target="_blank" rel="noopener">Résumé</a>
+  </nav>
+</div></header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="top">
+        <span class="sticker y" style="--r:-3deg">Portfolio · 2026</span>
+        <span class="clock" id="clock">Bengaluru</span>
+      </div>
+      <h1 class="display"><span class="row rv">Harsh</span><span class="row rv" style="--d:.08s"><span class="board">Vishwakarma</span></span></h1>
+      <div class="intro">
+        <p class="rv" style="--d:.16s">I design <b>products, brands and films</b>. Design owner at <b>Snapmint</b>, a consumer fintech in Bengaluru — and on the side I build my own: a clothing label, a grocery platform, tools my company now runs on.</p>
+        <div class="cta rv" style="--d:.22s">
+          <a class="pill yel" href="#cases">See case studies <span class="arr">↓</span></a>
+          <a class="pill line" href="#archive">Full archive</a>
+        </div>
+      </div>
+    </div>
+    <div class="marquee" aria-hidden="true">
+      <div class="track" id="mq1" style="--t:70s"></div>
+      <div class="track rev" id="mq2" style="--t:80s"></div>
+    </div>
+  </section>
+
+  <div class="wrap" id="cases">
+    <div class="sec-h">
+      <h2 class="display rv">Case<br><span class="board">studies</span></h2>
+      <p class="rv">Ten stories: what the problem was, what I did, and the real screens, films and products that came out of it.</p>
+    </div>
+    <div class="bento" id="bento"></div>
+  </div>
+
+  <div id="archive">
+    <div class="wrap">
+      <div class="sec-h">
+        <h2 class="display rv">The<br><span class="board">archive</span></h2>
+        <p class="rv">Everything else, sorted by craft and by type. Hover to play, tap to open.</p>
+      </div>
+    </div>
+    <div class="filters"><div class="wrap">
+      <div class="row" id="discs" role="group" aria-label="Discipline"></div>
+      <div class="row types" id="types" role="group" aria-label="Type" hidden></div>
+    </div></div>
+    <div class="wrap" id="list"></div>
+  </div>
+
+  <section class="contact">
+    <div class="wrap">
+      <h2 class="display">Let's<br><span class="board">build</span> something.</h2>
+      <div class="grid">
+        <div class="lines">
+          <span><a href="mailto:harshnaamhaimeraa@gmail.com">harshnaamhaimeraa@gmail.com</a><button class="copy" type="button" data-copy="harshnaamhaimeraa@gmail.com">copy</button></span>
+          <span><a href="tel:+916267962250">+91 62679 62250</a></span>
+          <span><a href="https://www.linkedin.com/in/harsh-vishvakarma-3068173b5" target="_blank" rel="noopener">LinkedIn ↗</a></span>
+        </div>
+        <div class="cta" style="display:flex;gap:10px;flex-wrap:wrap">
+          <a class="pill yel" href="/resume/Harsh-Vishvakarma-Resume.pdf" target="_blank" rel="noopener">Download résumé <span class="arr">↓</span></a>
+          <a class="pill line" href="/">World of Somnath ↗</a>
+        </div>
+      </div>
+      <div class="foot"><span>© 2026 Harsh Vishwakarma</span><span>Work made at Snapmint is shown with the products it was made for.</span></div>
+    </div>
+  </section>
+</main>
+
+<dialog class="viewer" id="viewer" aria-labelledby="vwTitle">
+  <div class="vw">
+    <div class="vw-head">
+      <div class="txt"><div class="label" id="vwCrumbs" style="color:var(--muted)"></div><h2 id="vwTitle"></h2><p class="sub" id="vwSub"></p><div id="vwCase"></div></div>
+      <button class="ib" id="vwPrev" type="button" aria-label="Previous"></button>
+      <button class="ib" id="vwNext" type="button" aria-label="Next"></button>
+      <button class="ib" id="vwClose" type="button" aria-label="Close"></button>
+    </div>
+    <div class="vw-body" id="vwBody"></div>
+  </div>
+</dialog>
+
+<script src="/assets/v2.js"></script>
+<script src="/assets/cases.js"></script>
+<script src="/work/data.js"></script>
+<script>
+(() => {
+  const { esc, tile, initMotion, ICON } = window.WOS;
+  const $ = s => document.querySelector(s);
+  const CASES = window.CASES, WORK = window.WORK, DISC = window.DISCIPLINES, TYPES = window.TYPES;
+
+  // clock
+  const fmt = new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true });
+  const tick = () => $('#clock').textContent = 'Bengaluru · ' + fmt.format(new Date()).toUpperCase();
+  tick(); setInterval(tick, 20000);
+
+  // marquee
+  const pics = [
+    ['/media/wl/andamen-popup.webp', .62], ['/media/t/upi__snapmint-upi-b__upi-home-tpap-linked.webp', .46], ['/media/i/mv__public-products__mahabali-back-cut.webp', .9],
+    ['/media/t/gatti__films-v1-film1-not-a-mu__film1-not-a-mug-4x5-poster.webp', .8], ['/media/sites/ajay/mobile-home-hero.webp', .46], ['/media/p/ugc-secrets.jpg', .56],
+    ['/media/sites/idstudio/50-card-meera-financial-services-front.webp', .63], ['/media/t/titan__app-1.webp', 1.5], ['/media/p/led-duroflex.jpg', .56],
+    ['/media/wl/controlz-popup.webp', .63], ['/media/t/perf__frame-10.webp', 1], ['/media/i/qr__snapmint-rebrandedqr-mannunalwork.webp', .7],
+    ['/media/p/mv-2024.jpg', 1.7], ['/media/i/pod__podcast-logo-f__frame-36.webp', 1.05], ['/media/sites/mokshavastra/mobile-home.webp', .46], ['/media/p/clou-amazon.jpg', 1.7],
+    ['/media/t/upi__credit-line-on-intermediate-f__activate-credit-line.webp', .46], ['/media/wl/manmatters-popup.webp', .78], ['/media/p/gatti-bl.jpg', .8], ['/media/t/comm__whtsapp-crouse__one.webp', 1],
+  ];
+  const fig = ([src, ar], i) => `<figure style="--ar:${ar};--r:${(i % 3 - 1) * 1.2}deg"><img src="${src}" alt="" loading="lazy"></figure>`;
+  const half = Math.ceil(pics.length / 2);
+  const a = pics.slice(0, half).map(fig).join(''), b = pics.slice(half).map(fig).join('');
+  $('#mq1').innerHTML = a + a; $('#mq2').innerHTML = b + b;
+
+  // bento
+  $('#bento').innerHTML = CASES.map(tile).join('');
+
+  // ---- archive ----
+  WORK.forEach((w, i) => w.i = i);
+  const caseFor = p => CASES.find(c => c.short === p || c.title === p || (p === 'Whitelabel Widget' && c.slug === 'whitelabel-widget') || (p === 'ID Studio' && c.slug === 'id-studio'));
+  const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const fmtDur = d => { const s = Math.round(d); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  let disc = 'All', type = 'All', visible = [];
+  const fromHash = () => { const d = DISC.find(x => slug(x) === location.hash.slice(1)); if (d) { disc = d; type = 'All'; } };
+
+  function card(w, onOpen) {
+    const m = w.m[0], ratio = m.w / m.h, svg = m.src.endsWith('.svg');
+    const v = w.m.find(x => x.v);
+    const el = document.createElement('button');
+    el.type = 'button'; el.className = 'card';
+    el.innerHTML = `<span class="th${svg ? ' svg' : (ratio > 1.9 ? ' fit' : '')}"><img src="${esc(m.t || m.src)}" alt="" loading="lazy">${w.c ? '<span class="concept">Concept</span>' : ''}${v ? `<span class="badge">${ICON.play} ${fmtDur(v.d)}</span>` : (w.m.length > 1 ? `<span class="badge">${w.m.length} frames</span>` : '')}</span><span class="t">${esc(w.t)}</span><span class="p">${esc(w.p)}</span>`;
+    el.addEventListener('click', onOpen);
+    if (v && matchMedia('(hover: hover)').matches) {
+      let vid;
+      el.addEventListener('mouseenter', () => { if (!vid) { vid = document.createElement('video'); vid.muted = true; vid.loop = true; vid.playsInline = true; vid.src = v.v; el.querySelector('.th').appendChild(vid); } vid.play().then(() => el.classList.add('playing')).catch(() => {}); });
+      el.addEventListener('mouseleave', () => { if (vid) { vid.pause(); el.classList.remove('playing'); } });
+    }
+    return el;
+  }
+  const chip = (label, n, on, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('aria-pressed', String(on)); b.innerHTML = `${esc(label)} <span class="n">${n}</span>`; b.onclick = fn; return b; };
+  function render() {
+    const count = d => WORK.filter(w => w.d === d).length;
+    $('#discs').replaceChildren(chip('All', WORK.length, disc === 'All', () => set('All', 'All')), ...DISC.map(d => chip(d, count(d), disc === d, () => set(d, 'All'))));
+    const types = $('#types'); types.hidden = disc === 'All';
+    if (disc !== 'All') { const inD = WORK.filter(w => w.d === disc); types.replaceChildren(chip('All ' + disc.toLowerCase(), inD.length, type === 'All', () => set(disc, 'All')), ...TYPES[disc].map(t => chip(t, inD.filter(w => w.s === t).length, type === t, () => set(disc, t)))); }
+    visible = WORK.filter(w => (disc === 'All' || w.d === disc) && (type === 'All' || w.s === type));
+    const out = [];
+    for (const d of DISC) {
+      if (disc !== 'All' && d !== disc) continue;
+      const di = visible.filter(w => w.d === d); if (!di.length) continue;
+      const g = document.createElement('section'); g.className = 'arch-group';
+      g.innerHTML = `<h3 class="display">${esc(d)}<span class="label">${di.length} pieces</span></h3>`;
+      for (const t of TYPES[d]) {
+        const items = di.filter(w => w.s === t); if (!items.length) continue;
+        const sub = document.createElement('div'); sub.className = 'arch-sub';
+        sub.innerHTML = `<h4>${esc(t)}<span class="label">${String(items.length).padStart(2, '0')}</span></h4>`;
+        const grid = document.createElement('div'); grid.className = 'mini';
+        items.forEach(w => grid.appendChild(card(w, () => openItem(w, visible))));
+        sub.appendChild(grid); g.appendChild(sub);
+      }
+      out.push(g);
+    }
+    $('#list').replaceChildren(...out);
+  }
+  function set(d, t) {
+    const changed = d !== disc; disc = d; type = t;
+    history.replaceState(null, '', d === 'All' ? location.pathname : '#' + slug(d));
+    render();
+    const y = $('#list').getBoundingClientRect().top + scrollY - 58 - $('.filters').offsetHeight - 10;
+    if ((changed || t !== 'All') && scrollY > y) scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  // viewer
+  const dlg = $('#viewer'); let ctx = null;
+  $('#vwPrev').innerHTML = ICON.l; $('#vwNext').innerHTML = ICON.r; $('#vwClose').innerHTML = ICON.x;
+  const mediaEl = m => {
+    if (m.v) return `<figure><video src="${esc(m.v)}" poster="${esc(m.src)}" controls playsinline preload="metadata" width="${m.w}" height="${m.h}"></video>${m.cap ? `<figcaption>${esc(m.cap)}</figcaption>` : ''}</figure>`;
+    return `<figure><img src="${esc(m.src)}" alt="${esc(m.cap || '')}" width="${m.w}" height="${m.h}" loading="lazy" class="${m.h / m.w > 2.4 ? 'tallimg' : ''}" style="${m.src.endsWith('.svg') ? 'background:#fff;padding:4%' : ''}">${m.cap ? `<figcaption>${esc(m.cap)}</figcaption>` : ''}</figure>`;
+  };
+  function show(w, list) {
+    ctx = { w, list };
+    $('#vwCrumbs').textContent = w.d + ' / ' + w.s;
+    $('#vwTitle').innerHTML = esc(w.t) + (w.c ? ' <span class="concept">Concept</span>' : '');
+    $('#vwSub').textContent = w.p + (w.n ? ' — ' + w.n : '');
+    const c = caseFor(w.p);
+    $('#vwCase').innerHTML = c ? `<a class="pill yel" style="margin-top:10px;font-size:13px;padding:7px 13px" href="/case/${c.slug}">Read the ${esc(c.short)} case study <span class="arr">→</span></a>` : '';
+    const gal = w.m.length > 3 && w.m.every(m => !m.v && m.w / m.h < 1.3 && m.w / m.h > .35);
+    $('#vwBody').innerHTML = `<div class="stack${gal ? ' gal' : ''}">${w.m.map(mediaEl).join('')}</div>`;
+    $('#vwBody').scrollTop = 0;
+    const i = list.indexOf(w); $('#vwPrev').disabled = i <= 0; $('#vwNext').disabled = i >= list.length - 1;
+    const v = $('#vwBody video'); if (v) v.play().catch(() => {});
+  }
+  function openItem(w, list) { show(w, list); if (!dlg.open) { dlg.showModal(); document.body.classList.add('lock'); } }
+  const step = d => { if (!ctx) return; const i = ctx.list.indexOf(ctx.w) + d; if (i >= 0 && i < ctx.list.length) show(ctx.list[i], ctx.list); };
+  $('#vwPrev').onclick = () => step(-1); $('#vwNext').onclick = () => step(1); $('#vwClose').onclick = () => dlg.close();
+  dlg.addEventListener('close', () => { document.body.classList.remove('lock'); $('#vwBody').innerHTML = ''; ctx = null; });
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+  addEventListener('keydown', e => { if (!dlg.open || e.target.tagName === 'VIDEO') return; if (e.key === 'ArrowLeft') step(-1); if (e.key === 'ArrowRight') step(1); });
+
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-copy]'); if (!b) return;
+    navigator.clipboard?.writeText(b.dataset.copy).then(() => { b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy', 1500); }).catch(() => {});
+  });
+
+  fromHash(); render();
+  addEventListener('hashchange', () => { fromHash(); render(); });
+  initMotion(document);
+})();
+</script>
+</body>
+</html>
