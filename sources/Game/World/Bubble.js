@@ -20,7 +20,7 @@ export class Bubble
         this.textWidth = 0
         this.textPaddingHorizontal = 10
         this.textOffsetVertical = 2
-        this.font = `700 ${this.height}px "Amatic SC"`
+        this.font = `800 condensed ${this.height * 0.78}px "Anybody"`
 
         this.group = new THREE.Group()
         this.group.rotation.reorder('YXZ')

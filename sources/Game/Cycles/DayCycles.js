@@ -2,10 +2,11 @@ import * as THREE from 'three/webgpu'
 import { Cycles } from './Cycles.js'
 
 const presets = {
-    day:   { revealColor: new THREE.Color('#5f7dff'), revealIntensity: 12, electricField: 0, temperature: 5, lightColor: new THREE.Color('#ffd2c2'), lightIntensity: 1.2, shadowColor: new THREE.Color('#6d3fff'), fogColorA: new THREE.Color('#00ffff'), fogColorB: new THREE.Color('#9b89ff'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
-    dusk:  { revealColor: new THREE.Color('#ff86d9'), revealIntensity: 5.55, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#ff8181'), lightIntensity: 1.2, shadowColor: new THREE.Color('#4e009c'), fogColorA: new THREE.Color('#3e53ff'), fogColorB: new THREE.Color('#ff4ce4'), fogNearRatio: 0, fogFarRatio: 1.25 },
-    night: { revealColor: new THREE.Color('#b678ff'), revealIntensity: 10, electricField: 1, temperature: -7.5, lightColor: new THREE.Color('#3240ff'), lightIntensity: 3.8, shadowColor: new THREE.Color('#2f00db'), fogColorA: new THREE.Color('#10266f'), fogColorB: new THREE.Color('#490a42'), fogNearRatio: -0.85, fogFarRatio: 1 },
-    dawn:  { revealColor: new THREE.Color('#ff9d9d'), revealIntensity: 4.85, electricField: 0.25, temperature: 0, lightColor: new THREE.Color('#ffa882'), lightIntensity: 1.2, shadowColor: new THREE.Color('#db004f'), fogColorA: new THREE.Color('#f885ff'), fogColorB: new THREE.Color('#ff7d24'), fogNearRatio: 0.3, fogFarRatio: 1.25 },
+    // World of Somnath: Bengaluru light. Warm sun, cool blue-grey shadows, dusty haze; signboard-yellow reveal.
+    day:   { revealColor: new THREE.Color('#f5c400'), revealIntensity: 6, electricField: 0, temperature: 4, lightColor: new THREE.Color('#fff0d8'), lightIntensity: 1.15, shadowColor: new THREE.Color('#5a6894'), fogColorA: new THREE.Color('#cfe6ef'), fogColorB: new THREE.Color('#f3d9b4'), fogNearRatio: 0.315, fogFarRatio: 1.25 },
+    dusk:  { revealColor: new THREE.Color('#ffb02e'), revealIntensity: 5, electricField: 0.15, temperature: 1, lightColor: new THREE.Color('#ffb07a'), lightIntensity: 1.2, shadowColor: new THREE.Color('#5c3f7a'), fogColorA: new THREE.Color('#f08a5d'), fogColorB: new THREE.Color('#ffcf8f'), fogNearRatio: 0.05, fogFarRatio: 1.25 },
+    night: { revealColor: new THREE.Color('#f5c400'), revealIntensity: 8, electricField: 0.6, temperature: -5, lightColor: new THREE.Color('#8c9cff'), lightIntensity: 2.6, shadowColor: new THREE.Color('#1c2252'), fogColorA: new THREE.Color('#111a3a'), fogColorB: new THREE.Color('#2c2142'), fogNearRatio: -0.6, fogFarRatio: 1 },
+    dawn:  { revealColor: new THREE.Color('#ffc46b'), revealIntensity: 4.85, electricField: 0.15, temperature: 1, lightColor: new THREE.Color('#ffc49a'), lightIntensity: 1.15, shadowColor: new THREE.Color('#6a4a72'), fogColorA: new THREE.Color('#ffd7b8'), fogColorB: new THREE.Color('#f5a27c'), fogNearRatio: 0.3, fogFarRatio: 1.25 },
 }
 
 export class DayCycles extends Cycles
@@ -14,6 +15,26 @@ export class DayCycles extends Cycles
     {
         const forcedProgress = import.meta.env.VITE_DAY_CYCLE_PROGRESS ? parseFloat(import.meta.env.VITE_DAY_CYCLE_PROGRESS) : null
         super('🕜 Day Cycles', 4 * 60, forcedProgress, false)
+    }
+
+    // World of Somnath: the sky follows the live time in Bengaluru (IST, UTC+5:30).
+    // IST hours are mapped onto the engine's keyframes: day until 16:00, dusk around 18:30,
+    // night from 20:00 to 04:30, dawn around 06:00, full day again by 07:30.
+    realProgress()
+    {
+        const istMs = Date.now() + 5.5 * 3600 * 1000
+        const hours = (istMs / 3600000) % 24
+        // [IST hour, progress] — progress 0 is 10:00
+        const map = [ [ 10, 0 ], [ 16, 0.15 ], [ 18.5, 0.25 ], [ 20, 0.35 ], [ 28.5, 0.6 ], [ 30, 0.8 ], [ 31.5, 0.9 ], [ 34, 1 ] ]
+        const h = hours < 10 ? hours + 24 : hours
+        let fraction = 0
+        for(let i = 0; i < map.length - 1; i++)
+        {
+            const [ h0, p0 ] = map[i], [ h1, p1 ] = map[i + 1]
+            if(h >= h0 && h <= h1) { fraction = p0 + (p1 - p0) * (h - h0) / (h1 - h0); break }
+        }
+        const dayIndex = Math.floor((istMs - 10 * 3600000) / 86400000)
+        return dayIndex + fraction
     }
 
     get presets()

@@ -332,7 +332,7 @@ export class View
     setSpherical()
     {
         this.spherical = {}
-        this.spherical.phi = Math.PI * (this.game.quality.level === 0 ? 0.31 : 0.27)
+        this.spherical.phi = Math.PI * (this.game.quality.level === 0 ? 0.26 : 0.24) // steeper than the original: the locality is dense
         this.spherical.theta = Math.PI * 0.25
 
         this.spherical.radius = {}

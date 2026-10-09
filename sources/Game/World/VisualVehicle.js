@@ -131,7 +131,8 @@ export class VisualVehicle
         this.paints = {}
 
         this.paints.choices = {}
-        this.paints.choices.red = this.game.materials.getFromName('redGradient')
+        // World of Somnath: the default paint is Bengaluru auto green (the reward named 'red' maps to it)
+        this.paints.choices.red = this.game.materials.createGradient('autoGreenGradient', '#36b26a', '#13603a', this.game.materials.debugPanel?.addFolder({ title: 'autoGreenGradient' }))
         this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#ff940d', '#af0071', this.game.materials.debugPanel?.addFolder({ title: 'orangeGradient' }))
         this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#ffffff', '#b5b5b5', this.game.materials.debugPanel?.addFolder({ title: 'whiteGradient' }))
         this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#626262', '#262526', this.game.materials.debugPanel?.addFolder({ title: 'blackGradient' }))

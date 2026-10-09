@@ -661,7 +661,7 @@ def build_terrain():
 
 def build_refs():
     x, y, z = SPAWN
-    r = ref('respawnLanding', (x, y, z), roty=math.pi * 0.75, collection=C_RESPAWN)
+    r = ref('respawnLanding', (x, y, z), roty=math.pi * 0.5, collection=C_RESPAWN)
     ref('respawnHero', (HERO['x0'] - 1.0, 0.6, HERO['z0'] - 2.0), collection=C_RESPAWN)
     ref('respawnPark', (PARK['x0'] + 3, 0.6, PARK['z0'] + 3), collection=C_RESPAWN)
     ref('respawnGround', ((VACANT['x0'] + VACANT['x1']) / 2, 0.6, VACANT['z1'] - 3), collection=C_RESPAWN)

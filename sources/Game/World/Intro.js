@@ -148,9 +148,10 @@ export class Intro
             let cachedTexture = this.text.textures.get(name)
             if(!cachedTexture)
             {
-                const loader = this.game.resourcesLoader.getLoader('textureKtx')
+                const loader = this.game.resourcesLoader.getLoader('texture')
                 
-                const resourcePath = `intro/${name}Label.ktx`
+                // World of Somnath: our own signboard labels (PNG masks)
+                const resourcePath = `intro/${name}Label.png`
                 loader.load(
                     resourcePath,
                     (loadedTexture) =>
@@ -160,8 +161,8 @@ export class Intro
                         // Update material and mesh
                         material.outputNode = Fn(() =>
                         {
-                            texture(loadedTexture, vec2(uv().x, uv().y.oneMinus())).r.lessThan(0.5).discard()
-                            return vec4(1)
+                            texture(loadedTexture, vec2(uv().x, uv().y)).r.lessThan(0.5).discard()
+                            return vec4(0.96, 0.77, 0, 1)
                         })()
                         material.needsUpdate = true
                         mesh.visible = true
@@ -173,8 +174,8 @@ export class Intro
                 // Update material and mesh
                 material.outputNode = Fn(() =>
                 {
-                    texture(cachedTexture, vec2(uv().x, uv().y.oneMinus())).r.lessThan(0.5).discard()
-                    return vec4(1)
+                    texture(cachedTexture, vec2(uv().x, uv().y)).r.lessThan(0.5).discard()
+                    return vec4(0.96, 0.77, 0, 1)
                 })()
                 material.needsUpdate = true
             }

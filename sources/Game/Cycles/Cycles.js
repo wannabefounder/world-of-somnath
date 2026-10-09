@@ -20,7 +20,7 @@ export class Cycles
 
         this.name = name
         this.duration = duration
-        this.absoluteProgress = forcedProgress !== null ? forcedProgress : (Date.now() / 1000 / this.duration)
+        this.absoluteProgress = forcedProgress !== null ? forcedProgress : this.realProgress()
         this.newAbsoluteProgress = this.absoluteProgress
         this.progress = this.absoluteProgress % 1
         this.progressDelta = 1
@@ -47,7 +47,7 @@ export class Cycles
             },
             () =>
             {
-                return forcedProgress !== null ? forcedProgress : ((new Date()).getTime() / 1000 / this.duration)
+                return forcedProgress !== null ? forcedProgress : this.realProgress()
             },
             manual
         )
@@ -138,6 +138,12 @@ export class Cycles
         this.keyframesList.push(keyframes)
 
         return keyframes
+    }
+
+    // Progress from the real clock. Subclasses can map it to a real time zone.
+    realProgress()
+    {
+        return Date.now() / 1000 / this.duration
     }
 
     update(firstFrame = false)

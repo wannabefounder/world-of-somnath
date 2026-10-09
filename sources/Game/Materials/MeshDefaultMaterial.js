@@ -1,9 +1,37 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { Fn, color, float, frontFacing, If, max, mix, normalWorld, positionWorld, vec2, vec3, vec4 } from 'three/tsl'
+import { Discard, Fn, cameraPosition, color, float, frontFacing, If, max, mix, normalWorld, positionWorld, screenCoordinate, screenSize, screenUV, uniform, vec2, vec3, vec4 } from 'three/tsl'
 
 export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
 {
+    /**
+     * World of Somnath: building cutaway.
+     * The locality is dense, so anything tall standing between the camera and the auto is cut away
+     * in a soft, dithered circle around the auto. Ground-level geometry (roads, footpaths, the auto
+     * itself) is kept because only fragments above `minHeight` are affected.
+     */
+    static cutaway = {
+        position: uniform(vec2(0.5, 0.5)),
+        radius: uniform(0),
+        depth: uniform(1e6),
+        minHeight: uniform(1.6),
+    }
+
+    static cutawayDiscardNodeBuilder = () =>
+    {
+        return Fn(() =>
+        {
+            const c = MeshDefaultMaterial.cutaway
+            const toVehicle = screenUV.sub(c.position).mul(vec2(screenSize.x.div(screenSize.y), 1))
+            const ring = toVehicle.length().div(c.radius.max(0.0001)).oneMinus().clamp(0, 1).mul(3).clamp(0, 1)
+            const nearer = positionWorld.sub(cameraPosition).length().lessThan(c.depth)
+            const high = positionWorld.y.greaterThan(c.minHeight)
+            // ordered-ish dither so the edge dissolves instead of clipping
+            const dither = screenCoordinate.x.mul(0.7548).add(screenCoordinate.y.mul(0.5698)).fract()
+            nearer.and(high).and(ring.greaterThan(dither)).discard()
+        })()
+    }
+
     static revealDiscardNodeBuilder = (game, outputColor) =>
     {
         return Fn(([ outputColor ]) =>
@@ -37,6 +65,7 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
         this.hasFog = parameters.hasFog ?? true
         this.hasWater = parameters.hasWater ?? true
         this.hasReveal = parameters.hasReveal ?? true
+        this.hasCutaway = parameters.hasCutaway ?? true
 
         this._colorNode = parameters.colorNode ?? color(0xffffff)
         this._normalNode = parameters.normalNode ?? normalWorld
@@ -121,6 +150,21 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
             // Fog
             if(this.hasFog)
                 outputColor.assign(this.game.fog.strength.mix(outputColor, this.game.fog.color))
+
+            // Cutaway around the vehicle (inlined so the discard lands in this shader's stack)
+            if(this.hasCutaway)
+            {
+                const c = MeshDefaultMaterial.cutaway
+                const toVehicle = screenUV.sub(c.position).mul(vec2(screenSize.x.div(screenSize.y), 1))
+                const ring = toVehicle.length().div(c.radius.max(0.0001)).oneMinus().clamp(0, 1).mul(3).clamp(0, 1)
+                const nearer = positionWorld.sub(cameraPosition).length().lessThan(c.depth)
+                const high = positionWorld.y.greaterThan(c.minHeight)
+                const dither = screenCoordinate.x.mul(0.7548).add(screenCoordinate.y.mul(0.5698)).fract()
+                If(nearer.and(high).and(ring.greaterThan(dither)), () =>
+                {
+                    Discard()
+                })
+            }
 
             // Alpha test discard
             this._alphaNode.lessThan(this.alphaTest).discard()

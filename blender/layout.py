@@ -38,4 +38,4 @@ HERO = {'x0': 0 + 4.5 + FP + 0.2, 'z0': 0 + 6.0 + FP + 0.2, 'w': 15.0, 'd': 15.0
 PARK = {'x0': -30.0, 'x1': -(4.5 + FP + 0.2), 'z0': 6.0 + FP + 0.2, 'z1': 30.0}     # NW corner
 VACANT = {'x0': -26.0, 'x1': -(4.5 + FP + 0.2), 'z0': -28.0, 'z1': -(6.0 + FP + 0.2)}  # SW corner: gully cricket ground
 AUTO_STAND = (-(4.5 + FP) - 0.2, 9.5)        # on the NW footpath edge, beside the park
-SPAWN = (-6.0, 0.6, 14.0)                     # companion spawns near the auto stand, facing the junction
+SPAWN = (-2.2, 0.6, 22.0)                    # on 4th Cross, southbound lane, facing the 8th Main junction

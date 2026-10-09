@@ -66,23 +66,39 @@ export class World
             this.snow = new Snow()
             this.visualTornado = new VisualTornado()
             this.bushes = new Bushes()
-            this.birchTrees = new Trees('Birch Tree', this.game.resources.birchTreesVisualModel.scene, this.game.resources.birchTreesReferencesModel.scene.children, '#ff4f2b', '#ff903f')
-            this.oakTrees = new Trees('Oak Tree', this.game.resources.oakTreesVisualModel.scene, this.game.resources.oakTreesReferencesModel.scene.children, '#b4b536', '#d8cf3b')
-            this.cherryTrees = new Trees('Cherry Tree', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ff6d6d', '#ff9990')
+            // World of Somnath: Bengaluru rain trees (oak visual) and tabebuia (cherry visual).
+            // Bruno's birch trees, bricks, fences, benches, crates, pole lights and lanterns are not placed in the locality.
+            this.oakTrees = new Trees('Rain Tree', this.game.resources.oakTreesVisualModel.scene, this.game.resources.oakTreesReferencesModel.scene.children, '#3f7a2e', '#6a9a3a')
+            this.cherryTrees = new Trees('Tabebuia', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ee7fb3', '#ffb0d2')
             this.flowers = new Flowers()
-            this.bricks = new Bricks()
-            this.fences = new Fences()
-            this.benches = new Benches()
-            this.explosiveCrates = new ExplosiveCrates()
-            this.poleLights = new PoleLights()
-            this.lanterns = new Lanterns()
             this.scenery = new Scenery()
             this.areas = new Areas()
+            this.setCutaway()
         }
         else if(step === 2)
         {
             this.whispers = new Whispers()
         }
+    }
+
+    setCutaway()
+    {
+        const cutaway = MeshDefaultMaterial.cutaway
+        const target = new THREE.Vector3()
+        const cameraWorld = new THREE.Vector3()
+        window.__cutaway = cutaway
+        this.game.ticker.events.on('tick', () =>
+        {
+            const vehicle = this.visualVehicle
+            if(!vehicle || !vehicle.parts.chassis)
+                return
+            vehicle.parts.chassis.getWorldPosition(target)
+            cutaway.position.value.set(vehicle.screenPosition.x, vehicle.screenPosition.y)
+            this.game.view.camera.getWorldPosition(cameraWorld)
+            cutaway.depth.value = cameraWorld.distanceTo(target) - 2.5
+            // radius in screen-height units, bigger when the camera is close
+            cutaway.radius.value = Math.min(0.42, 10 / Math.max(1, this.game.view.spherical.radius.current))
+        }, 12)
     }
 
     setPhysicalFloor()
