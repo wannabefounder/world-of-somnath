@@ -11,3 +11,4 @@ dist
 static/sounds/musics/*.wav
 # Python caches
 __pycache__/
+*.blend1
