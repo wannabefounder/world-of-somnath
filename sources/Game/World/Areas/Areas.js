@@ -13,6 +13,7 @@ import { BehindTheSceneArea } from './BehindTheSceneArea.js'
 import { AchievementsArea } from './AchievementsArea.js'
 import { TimeMachineArea } from './TimeMachineArea.js'
 import { EasterArea } from './EasterArea.js'
+import { HomeArea } from './HomeArea.js'
 
 export class Areas
 {
@@ -28,6 +29,7 @@ export class Areas
             [ 'career', CareerArea ],
             [ 'circuit', CircuitArea ],
             [ 'cookie', CookieArea ],
+            [ 'home', HomeArea ],
             [ 'lab', LabArea ],
             [ 'landing', LandingArea ],
             [ 'projects', ProjectsArea ],

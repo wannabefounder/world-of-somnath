@@ -28,6 +28,7 @@ export class Materials
         this.createEmissiveGradient('emissivePurpleRadialGradient', '#454bbc', '#ff2eb4', 1.7, true, this.debugPanel?.addFolder({ title: 'emissivePurpleRadialGradient' }))
         this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveBlueRadialGradient' }))
         this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
+        this.createNightLights()
         this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false, this.debugPanel?.addFolder({ title: 'emissiveWhiteRadialGradient' }))
         
         this.createGradient('redGradient', '#ff3a3a', '#721551', this.debugPanel?.addFolder({ title: 'redGradient' }))
@@ -127,6 +128,43 @@ export class Materials
         }
 
         return material
+    }
+
+    // World of Somnath: window and street-lamp materials that light up after dusk (live Bengaluru time)
+    createNightLights()
+    {
+        this.nightLights = uniform(0)
+
+        const make = (name, dayHex, nightHex, intensity) =>
+        {
+            const dayColor = uniform(color(dayHex))
+            const nightColor = uniform(color(nightHex))
+            const material = new THREE.MeshBasicNodeMaterial()
+            material.outputNode = Fn(() =>
+            {
+                MeshDefaultMaterial.applyCutaway()
+                const lit = mix(dayColor.mul(this.game.lighting.colorUniform), nightColor.mul(intensity), this.nightLights)
+                const outputColor = vec4(lit, 1)
+                outputColor.assign(MeshDefaultMaterial.revealDiscardNodeBuilder(this.game, outputColor))
+                return outputColor
+            })()
+            material.fog = false
+            this.save(name, material)
+        }
+
+        make('windowLit', '#c9c2b4', '#ffc46a', 1.8)
+        make('streetLamp', '#e9e3d6', '#fff1c9', 3.2)
+
+        this.game.ticker.events.on('tick', () =>
+        {
+            const p = this.game.dayCycles.progress
+            // on from dusk (0.22 → 0.30), off at dawn (0.70 → 0.80)
+            let v = 0
+            if(p >= 0.22 && p < 0.30) v = (p - 0.22) / 0.08
+            else if(p >= 0.30 && p < 0.70) v = 1
+            else if(p >= 0.70 && p < 0.80) v = 1 - (p - 0.70) / 0.10
+            this.nightLights.value = v
+        }, 3)
     }
 
     createEmissiveGradient(_name = 'material', _colorA = '#ffffff', _colorB = '#ff0000', _intensity = 3, normalize = true, debugPanel = null)

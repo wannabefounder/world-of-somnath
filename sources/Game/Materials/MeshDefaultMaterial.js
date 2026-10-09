@@ -17,19 +17,19 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
         minHeight: uniform(1.6),
     }
 
-    static cutawayDiscardNodeBuilder = () =>
+    // Call inside a TSL Fn body: discards fragments that stand between the camera and the auto
+    static applyCutaway = () =>
     {
-        return Fn(() =>
+        const c = MeshDefaultMaterial.cutaway
+        const toVehicle = screenUV.sub(c.position).mul(vec2(screenSize.x.div(screenSize.y), 1))
+        const ring = toVehicle.length().div(c.radius.max(0.0001)).oneMinus().clamp(0, 1).mul(3).clamp(0, 1)
+        const nearer = positionWorld.sub(cameraPosition).length().lessThan(c.depth)
+        const high = positionWorld.y.greaterThan(c.minHeight)
+        const dither = screenCoordinate.x.mul(0.7548).add(screenCoordinate.y.mul(0.5698)).fract()
+        If(nearer.and(high).and(ring.greaterThan(dither)), () =>
         {
-            const c = MeshDefaultMaterial.cutaway
-            const toVehicle = screenUV.sub(c.position).mul(vec2(screenSize.x.div(screenSize.y), 1))
-            const ring = toVehicle.length().div(c.radius.max(0.0001)).oneMinus().clamp(0, 1).mul(3).clamp(0, 1)
-            const nearer = positionWorld.sub(cameraPosition).length().lessThan(c.depth)
-            const high = positionWorld.y.greaterThan(c.minHeight)
-            // ordered-ish dither so the edge dissolves instead of clipping
-            const dither = screenCoordinate.x.mul(0.7548).add(screenCoordinate.y.mul(0.5698)).fract()
-            nearer.and(high).and(ring.greaterThan(dither)).discard()
-        })()
+            Discard()
+        })
     }
 
     static revealDiscardNodeBuilder = (game, outputColor) =>
@@ -151,20 +151,9 @@ export class MeshDefaultMaterial extends THREE.MeshLambertNodeMaterial
             if(this.hasFog)
                 outputColor.assign(this.game.fog.strength.mix(outputColor, this.game.fog.color))
 
-            // Cutaway around the vehicle (inlined so the discard lands in this shader's stack)
+            // Cutaway around the vehicle
             if(this.hasCutaway)
-            {
-                const c = MeshDefaultMaterial.cutaway
-                const toVehicle = screenUV.sub(c.position).mul(vec2(screenSize.x.div(screenSize.y), 1))
-                const ring = toVehicle.length().div(c.radius.max(0.0001)).oneMinus().clamp(0, 1).mul(3).clamp(0, 1)
-                const nearer = positionWorld.sub(cameraPosition).length().lessThan(c.depth)
-                const high = positionWorld.y.greaterThan(c.minHeight)
-                const dither = screenCoordinate.x.mul(0.7548).add(screenCoordinate.y.mul(0.5698)).fract()
-                If(nearer.and(high).and(ring.greaterThan(dither)), () =>
-                {
-                    Discard()
-                })
-            }
+                MeshDefaultMaterial.applyCutaway()
 
             // Alpha test discard
             this._alphaNode.lessThan(this.alphaTest).discard()
