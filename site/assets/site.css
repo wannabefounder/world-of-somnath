@@ -1,0 +1,72 @@
+:root {
+  --bg: #f3f0e8;
+  --bg-2: #ebe6da;
+  --tile: #e4ded0;
+  --ink: #17150f;
+  --ink-2: #4a463d;
+  --muted: #7a7466;
+  --line: #d9d2c2;
+  --yellow: #f5c400;
+  --yellow-ink: #17150f;
+  --green: #1f7a45;
+  --scrim: rgba(23, 21, 15, .62);
+  --shadow: 0 1px 0 rgba(23, 21, 15, .04), 0 12px 32px -18px rgba(23, 21, 15, .35);
+  --display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --gutter: clamp(16px, 4vw, 48px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12110e; --bg-2: #1a1814; --tile: #221f1a; --ink: #f0ebe0; --ink-2: #c9c2b4; --muted: #8f887a;
+    --line: #2f2b24; --green: #4fbf7d; --scrim: rgba(0, 0, 0, .74);
+    --shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 12px 32px -18px rgba(0, 0, 0, .8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12110e; --bg-2: #1a1814; --tile: #221f1a; --ink: #f0ebe0; --ink-2: #c9c2b4; --muted: #8f887a;
+  --line: #2f2b24; --green: #4fbf7d; --scrim: rgba(0, 0, 0, .74);
+  --shadow: 0 1px 0 rgba(0, 0, 0, .2), 0 12px 32px -18px rgba(0, 0, 0, .8);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--sans); }
+img, video { max-width: 100%; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+.wrap { width: 100%; padding-inline: var(--gutter); max-width: 1440px; margin-inline: auto; }
+.mono { font-family: var(--mono); font-size: 12px; letter-spacing: .02em; }
+.label { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Top bar */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 16px; height: 56px; }
+.brand { font: 700 17px/1 var(--display); letter-spacing: -.01em; text-decoration: none; white-space: nowrap; }
+.brand small { font: 400 12px var(--mono); color: var(--muted); margin-left: 8px; letter-spacing: 0; }
+.top nav { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.top nav a, .btn { text-decoration: none; padding: 7px 12px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
+.top nav a:hover { background: var(--bg-2); }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--ink); background: var(--ink); color: var(--bg); cursor: pointer; }
+.btn:hover { background: transparent; color: var(--ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn.yellow { background: var(--yellow); border-color: var(--yellow); color: var(--yellow-ink); }
+.btn.yellow:hover { background: transparent; color: var(--ink); border-color: var(--yellow); }
+@media (max-width: 640px) {
+  .brand small { display: none; }
+  .top nav .hide-sm { display: none; }
+}
+
+/* Concept badge */
+.concept { display: inline-block; font: 500 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  background: var(--yellow); color: var(--yellow-ink); padding: 4px 6px 3px; border-radius: 3px; vertical-align: 1px; }
+
+/* Hazard tape */
+.tape { height: 14px; background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, #17150f 14px 28px); }
