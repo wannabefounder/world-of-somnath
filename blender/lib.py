@@ -173,6 +173,29 @@ class MeshBuilder:
             else:
                 for loop in f2.loops: loop[self.uv].uv = swatch_uv(sw)
 
+    def sphere(self, c, r, sw, seg=14, rings=9, mat='palette', M=None):
+        """Ellipsoid (r = radius or (rx, ry, rz)), flat-shaded like everything else."""
+        rx, ry, rz = (r, r, r) if isinstance(r, (int, float)) else r
+        T = Matrix.Translation(c)
+        if M is not None: T = M @ T
+        top = self.bm.verts.new(self._xf((0, ry, 0), T)); bot = self.bm.verts.new(self._xf((0, -ry, 0), T))
+        ringv = []
+        for i in range(1, rings):
+            ph = math.pi * i / rings
+            ringv.append([self.bm.verts.new(self._xf((math.sin(ph) * math.cos(2 * math.pi * k / seg) * rx, math.cos(ph) * ry,
+                                                     math.sin(ph) * math.sin(2 * math.pi * k / seg) * rz), T)) for k in range(seg)])
+        mi = self.slot(mat); u = swatch_uv(sw); fl = []
+        for k in range(seg):
+            j = (k + 1) % seg
+            fl.append(self.bm.faces.new([top, ringv[0][j], ringv[0][k]]))
+            fl.append(self.bm.faces.new([bot, ringv[-1][k], ringv[-1][j]]))
+            for i in range(len(ringv) - 1):
+                fl.append(self.bm.faces.new([ringv[i][k], ringv[i][j], ringv[i + 1][j], ringv[i + 1][k]]))
+        bmesh.ops.recalc_face_normals(self.bm, faces=fl)
+        for f in fl:
+            f.material_index = mi
+            for loop in f.loops: loop[self.uv].uv = u
+
     def tube(self, pts, r, sw, seg=5, mat='palette'):
         """Polyline tube through three-space points (cables)."""
         rings = []

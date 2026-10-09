@@ -1,10 +1,12 @@
 import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
+import { projectsOnMain } from './projectsOnMain.js'
 
 /**
  * World of Somnath — the junction of 8th Main and 4th Cross.
  * Somnath Nilaya (the hero building) is the door to the portfolio; the auto stand
- * is where rides to each project will start.
+ * is where rides to each project will start; the ten buildings along 8th Main each
+ * open their case study.
  */
 export class HomeArea extends Area
 {
@@ -25,6 +27,19 @@ export class HomeArea extends Area
                 5
             )
         })
+
+        for(const project of projectsOnMain)
+        {
+            this.setPoint(`project${project.letter}Point`, `${project.n} ${project.title}`, () =>
+            {
+                window.open(`https://somnath.world/case/${project.slug}`, '_blank', 'noopener')
+                this.game.notifications?.show?.(
+                    `<div class="title">${project.n} · ${project.title}</div><p class="text">${project.kicker}. The case study opened in a new tab.</p>`,
+                    'project',
+                    4
+                )
+            })
+        }
     }
 
     setPoint(referenceName, label, onInteract)

@@ -210,8 +210,8 @@ export class InteractivePoints
          */
         // Canvas
         const height = 64
-        const textPaddingLeft = align === InteractivePoints.ALIGN_LEFT ? 60 : 12
-        const textPaddingRight = align === InteractivePoints.ALIGN_LEFT ? 12 : 60
+        const textPaddingLeft = align === InteractivePoints.ALIGN_LEFT ? 84 : 14
+        const textPaddingRight = align === InteractivePoints.ALIGN_LEFT ? 14 : 84
         const textOffsetVertical = 2
         const font = `800 condensed ${height * 0.78}px "Anybody"`
 

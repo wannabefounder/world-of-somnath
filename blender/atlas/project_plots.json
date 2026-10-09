@@ -1,0 +1,62 @@
+[
+ {
+  "letter": "A",
+  "slug": "snapmint-upi",
+  "cx": 12.16,
+  "side": "z1"
+ },
+ {
+  "letter": "B",
+  "slug": "credit-line-on-upi",
+  "cx": 22.89,
+  "side": "z1"
+ },
+ {
+  "letter": "C",
+  "slug": "checkout-and-onboarding",
+  "cx": 29.6,
+  "side": "z0"
+ },
+ {
+  "letter": "D",
+  "slug": "whitelabel-widget",
+  "cx": -32.67,
+  "side": "z1"
+ },
+ {
+  "letter": "E",
+  "slug": "mokshavastra",
+  "cx": 33.61,
+  "side": "z1"
+ },
+ {
+  "letter": "F",
+  "slug": "ajay-sanjay",
+  "cx": -35.67,
+  "side": "z0"
+ },
+ {
+  "letter": "G",
+  "slug": "id-studio",
+  "cx": 43.0,
+  "side": "z0"
+ },
+ {
+  "letter": "H",
+  "slug": "qr-studio",
+  "cx": -44.02,
+  "side": "z1"
+ },
+ {
+  "letter": "I",
+  "slug": "gatti",
+  "cx": 44.34,
+  "side": "z1"
+ },
+ {
+  "letter": "J",
+  "slug": "buy-the-way",
+  "cx": -45.02,
+  "side": "z0"
+ }
+]

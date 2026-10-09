@@ -99,6 +99,55 @@ emissive_box('stopLights', [((-1.12, Y0 + 0.78, 0.5), (0.02, 0.1, 0.14)), ((-1.1
 emissive_box('blinkerLeft', [((1.3, Y0 + 0.98, -0.3), (0.08, 0.06, 0.06)), ((-1.1, Y0 + 0.98, -0.58), (0.04, 0.06, 0.06))])
 emissive_box('blinkerRight', [((1.3, Y0 + 0.98, 0.3), (0.08, 0.06, 0.06)), ((-1.1, Y0 + 0.98, 0.58), (0.04, 0.06, 0.06))])
 
+# ---------- Chikku, the companion who rides on the roof ----------
+# A round, curry-leaf-topped blob in auto yellow with a green auto-driver cap. Faces +x (forward).
+# Hierarchy (animated by sources/Game/World/Companion.js):
+#   companion (empty, yaw)  ->  companionBody (squash/stretch, origin at the feet)
+#                                 -> companionEyes (blink), companionArmL / companionArmR (wave), companionLeaf (wobble)
+ROOF = Y0 + 1.67
+CP = (-0.28, ROOF, 0.0)                         # chassis-local seat on the canopy
+def node(name, pivot, parent, parent_pivot, build):
+    mb = MeshBuilder(); build(mb)
+    ob = mb.to_object(name, pivot, col)
+    ob.parent = parent
+    ob.location = bv(pivot[0] - parent_pivot[0], pivot[1] - parent_pivot[1], pivot[2] - parent_pivot[2])
+    return ob
+comp = bpy.data.objects.new('companion', None); col.objects.link(comp)
+comp.parent = chassis; comp.location = bv(*CP); comp.scale = (1.4, 1.4, 1.4)   # exaggerated on purpose
+cx, cy, cz = CP
+def chikku_body(mb):
+    mb.sphere((cx, cy + 0.31, cz), (0.34, 0.31, 0.33), Yel)                       # the blob
+    mb.sphere((cx + 0.22, cy + 0.16, cz), (0.12, 0.11, 0.17), Cr)                  # cream belly
+    for s in (-1, 1):
+        mb.sphere((cx + 0.17, cy + 0.04, cz + s * 0.15), (0.11, 0.05, 0.08), G, seg=10, rings=6)   # feet
+        mb.sphere((cx + 0.27, cy + 0.33, cz + s * 0.2), (0.03, 0.035, 0.05), P['pink'], seg=8, rings=5)  # cheeks
+    mb.sphere((cx + 0.3, cy + 0.27, cz), (0.03, 0.03, 0.075), P['crimson'], seg=10, rings=6)   # open little smile
+    # green auto-driver cap with a brim
+    mb.cyl((cx, cy + 0.6, cz), 0.23, 0.08, G, seg=14, r2=0.2)
+    mb.box((cx + 0.21, cy + 0.575, cz), (0.2, 0.025, 0.3), G)
+    mb.cyl((cx, cy + 0.65, cz), 0.035, 0.03, Yel, seg=8)                           # button on top
+body = node('companionBody', CP, comp, CP, chikku_body)
+EY = (cx + 0.27, cy + 0.42, cz)
+def chikku_eyes(mb):
+    for s in (-1, 1):
+        mb.sphere((EY[0], EY[1], cz + s * 0.11), (0.05, 0.085, 0.068), Cr, seg=10, rings=7)
+        mb.sphere((EY[0] + 0.04, EY[1] - 0.01, cz + s * 0.11), (0.03, 0.055, 0.042), Blk, seg=10, rings=7)
+        mb.sphere((EY[0] + 0.065, EY[1] + 0.025, cz + s * 0.1), 0.013, Cr, seg=6, rings=4)   # catch light
+node('companionEyes', EY, body, CP, chikku_eyes)
+for nm, s in (('companionArmL', 1), ('companionArmR', -1)):
+    sh = (cx + 0.04, cy + 0.32, cz + s * 0.31)
+    def arm(mb, sh=sh, s=s):
+        mb.sphere((sh[0], sh[1] - 0.1, sh[2] + s * 0.02), (0.055, 0.12, 0.055), Yel, seg=8, rings=6)
+        mb.sphere((sh[0], sh[1] - 0.22, sh[2] + s * 0.025), 0.05, Cr, seg=8, rings=5)
+    node(nm, sh, body, CP, arm)
+LF = (cx - 0.02, cy + 0.66, cz)
+def leaf(mb):
+    mb.cyl((LF[0], LF[1] + 0.1, LF[2]), 0.016, 0.2, G, seg=5)                    # curry-leaf sprig, big on purpose
+    mb.sphere((LF[0] + 0.08, LF[1] + 0.23, LF[2] + 0.05), (0.15, 0.03, 0.065), G, seg=10, rings=5)
+    mb.sphere((LF[0] - 0.07, LF[1] + 0.19, LF[2] - 0.06), (0.12, 0.028, 0.055), P['sage'], seg=10, rings=5)
+    mb.sphere((LF[0] + 0.0, LF[1] + 0.27, LF[2] - 0.02), (0.1, 0.026, 0.05), G, seg=10, rings=5)
+node('companionLeaf', LF, body, CP, leaf)
+
 # ---------- wheel ----------
 wc = bpy.data.objects.new('wheelContainer', None); col.objects.link(wc)
 wc.location = bv(0.9, -0.45, -0.75)

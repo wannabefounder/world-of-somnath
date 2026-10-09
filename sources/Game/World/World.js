@@ -28,6 +28,7 @@ import { Lanterns } from './Lanterns.js'
 import { Fences } from './Fences.js'
 import { Benches } from './Benches.js'
 import { Scenery } from './Scenery.js'
+import { Companion } from './Companion.js'
 
 export class World
 {
@@ -54,6 +55,7 @@ export class World
         else if(step === 1)
         {
             this.visualVehicle = new VisualVehicle(this.game.resources.vehicle.scene)
+            this.companion = new Companion(this.visualVehicle)
             this.floor = new Floor()
             this.waterSurface = new WaterSurface()
             this.grass = new Grass()

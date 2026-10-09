@@ -33,6 +33,7 @@ C_SCENERY, C_TERRAIN, C_RESPAWN, C_RAIN, C_TABE, C_BUSH, C_FLOW, C_AREAS = [coll
 mat('palette', hexrgba('#ffffff'))
 mat('signs', image=os.path.join(HERE, 'atlas', 'signs.png'))
 mat('ads', image=os.path.join(HERE, 'atlas', 'ads.png'))
+mat('projectBoards', image=os.path.join(HERE, 'atlas', 'projects.png'))
 mat('black', hexrgba('#383039'))
 mat('windowLit', hexrgba('#ffd08a'))
 mat('streetLamp', hexrgba('#fff1c9'))
@@ -212,10 +213,13 @@ def building(M, w, d, floors, kind, wall=None, sign=None, setback=None, seed=Non
             for sx in (-1, 1):
                 mb.box((x + sx * (sw_ / 2 - 0.12), Y0 + 1.2, fz - 0.6), (0.22, 2.4, 1.3), P[wall], M=M)
         # signboard (atlas)
-        key = sign or (shop_queue.pop(0) if shop_queue else pick(SHOP_KEYS))
-        u0, v0, u1, v1 = ATLAS['signs'][key]
+        if isinstance(sign, tuple):   # ('projects', slug): a project building's own fascia
+            u0, v0, u1, v1 = ATLAS[sign[0]][sign[1]]; smat = 'projectBoards'
+        else:
+            key = sign or (shop_queue.pop(0) if shop_queue else pick(SHOP_KEYS))
+            u0, v0, u1, v1 = ATLAS['signs'][key]; smat = 'signs'
         sbw = bw - 0.5; sbh = min(1.0, sbw / 4.0)
-        mb.box((0, Y0 + 2.95, fz + 0.12), (sbw, sbh, 0.1), P['dark'], M=M, mat='signs', uvrect=(u0, v0, u1, v1), uvface='pz')
+        mb.box((0, Y0 + 2.95, fz + 0.12), (sbw, sbh, 0.1), P['dark'], M=M, mat=smat, uvrect=(u0, v0, u1, v1), uvface='pz')
         # tin awning
         mb.box((0, Y0 + 2.36, fz + 0.66), (bw - 0.3, 0.04, 1.3), P[pick(['cyan', 'autoGreen', 'red', 'yellow', 'grey'])], M=M, rot=(0.22, 0, 0))
     else:
@@ -264,6 +268,7 @@ def building(M, w, d, floors, kind, wall=None, sign=None, setback=None, seed=Non
     c = M @ Vector((0, Y0 + H / 2, cz, 1))
     yaw = math.atan2(M[0][2], M[0][0])
     cols.append(((c[0], c[1], c[2]), (bw, H, bd), yaw, name))
+    return {'H': H, 'bw': bw, 'bd': bd, 'fz': fz, 'name': name}
 
 def plots_along(a0, a1, place, minw=7.4, maxw=10.6):
     a = a0
@@ -283,6 +288,68 @@ def floors_for(kind, dist):
     if kind == 'shop': return int(rr(base, base + 2.6))
     return int(rr(1, base + 1.6))
 
+# ============================================================== project buildings on 8th Main
+PROJECTS = json.load(open(os.path.join(HERE, 'atlas', 'projects.json')))
+def project_plots():
+    """Ten plots facing 8th Main nearest the junction, numbered by distance (01 closest)."""
+    (sx0, sx1), (wx0, wx1) = X_BANDS[2], X_BANDS[1]
+    zS, zN = Z_BANDS[1][1] - 0.1, Z_BANDS[2][0] + 0.1
+    hero_end = HERO['x0'] + HERO['w'] + 1.0
+    spans = []
+    def split(a0, a1, n, zf, side):
+        w = (a1 - a0) / n
+        for k in range(n): spans.append({'cx': a0 + w * (k + 0.5), 'w': w, 'zf': zf, 'side': side})
+    split(sx0 + 0.1, sx1 - 0.1, 4, zS, 'z1')                  # south-east of the junction
+    split(hero_end, sx1 - 0.1, 2, zN, 'z0')                   # north-east, past Somnath Nilaya
+    split(wx0 + 0.1, VACANT['x0'] - 1.0, 2, zS, 'z1')         # south-west, past the cricket ground
+    split(wx0 + 0.1, PARK['x0'] - 1.0, 2, zN, 'z0')           # north-west, past the park
+    spans.sort(key=lambda s_: abs(s_['cx']))
+    for i, s_ in enumerate(spans): s_['project'] = PROJECTS[i]; s_['letter'] = chr(65 + i)
+    return spans
+PROJECT_PLOTS = project_plots()
+PROJECT_WALLS = ['cream', 'sand', 'lemon', 'sky', 'peach', 'mint', 'lilac', 'apricot', 'palepink', 'sage']
+
+def subtract(a0, a1, cuts):
+    out = []; a = a0
+    for c0, c1 in sorted(cuts):
+        if c1 <= a or c0 >= a1: continue
+        if c0 - a > 0.01: out.append((a, c0))
+        a = max(a, c1)
+    if a1 - a > 0.01: out.append((a, a1))
+    return out
+
+def project_building(plot, mb, cols):
+    """A taller mixed-use building whose fascia and rooftop hoarding name the project."""
+    i = ord(plot['letter']) - 65
+    ry_ = 0.0 if plot['side'] == 'z1' else math.pi
+    M = xform(plot['cx'], plot['zf'], ry_)
+    slug = plot['project']['slug']
+    floors = 3
+    info = building(M, plot['w'], PLOT_DEPTH, floors, 'shop', wall=PROJECT_WALLS[i], sign=('projects', slug), mb=mb, cols=cols)
+    u0, v0, u1, v1 = ATLAS['projects'][slug]
+    top = FPH + info['H']; bw = info['bw']; fz = info['fz']
+    # low rooftop hoarding at the road edge of the terrace, printed on both faces so the
+    # camera (which looks from +x/+z) reads it on either side of 8th Main
+    hw = min(bw - 1.2, 6.8); hh = hw / 4.0; hz = fz - 0.9; hy = top + 0.95 + hh / 2
+    for sx in (-1, 1):
+        mb.box((sx * hw * 0.34, top + (hy - top) / 2, hz - 0.3), (0.14, hy - top, 0.14), P['grey'], M=M)
+    mb.box((0, hy, hz), (hw + 0.2, hh + 0.2, 0.1), P['black'], M=M)
+    mb.box((0, hy, hz + 0.06), (hw, hh, 0.02), P['dark'], M=M, mat='projectBoards', uvrect=(u0, v0, u1, v1), uvface='pz')
+    mb.box((0, hy, hz - 0.06), (hw, hh, 0.02), P['dark'], M=M, mat='projectBoards', uvrect=(u0, v0, u1, v1), uvface='nz')
+    for k in range(3):   # flood lamps over the board (lit after dusk)
+        x = -hw / 3 + k * hw / 3
+        mb.box((x, hy + hh / 2 + 0.18, hz + 0.25), (0.04, 0.04, 0.5), P['grey'], M=M)
+        mb.box((x, hy + hh / 2 + 0.15, hz + 0.5), (0.3, 0.08, 0.16), P['cream'], M=M, mat='streetLamp')
+    # yellow door-number plate beside the shutter, like a BBMP number
+    mb.box((bw / 2 - 0.45, FPH + 2.9, 0.08), (0.5, 0.36, 0.04), P['autoYellow'], M=M)
+    # yellow stop box painted on the road edge: park the auto inside it to open the case
+    # (FP + 1.1 m in front of the plot face, so the inner lane passes within reach)
+    d = FP + 1.15
+    mb.box((0, 0.024, d), (3.2, 0.01, 2.2), P['autoYellow'], M=M, mat='palette')
+    mb.box((0, 0.026, d), (2.9, 0.01, 1.9), P['dark'], M=M, mat='black')
+    fwd = M @ Vector((0, 0, d, 1)); plot['point'] = (fwd[0], 1.2, fwd[2])
+    return info
+
 def build_blocks():
     for b in blocks():
         bmb = MeshBuilder(); bcols = []
@@ -297,13 +364,17 @@ def build_blocks():
             if side in ('z1', 'z0'):
                 zf = z1 if side == 'z1' else z0
                 ry = 0.0 if side == 'z1' else math.pi
+                mine = [p_ for p_ in PROJECT_PLOTS if p_['side'] == side and abs(p_['zf'] - zf) < 0.5 and x0 - 0.5 <= p_['cx'] <= x1 + 0.5]
                 def place(cx, w):
                     cz_ = zf - PLOT_DEPTH / 2 if side == 'z1' else zf + PLOT_DEPTH / 2
                     if skip(cx, cz_): return
                     dist = math.hypot(cx, zf)
                     kind = 'shop' if (abs(zf) < 12 or rng.random() < 0.35) and rng.random() < 0.85 else 'house'
                     building(xform(cx, zf, ry), w, PLOT_DEPTH, floors_for(kind, dist), kind, mb=bmb, cols=bcols)
-                plots_along(x0, x1, place)
+                for a0, a1 in subtract(x0, x1, [(p_['cx'] - p_['w'] / 2, p_['cx'] + p_['w'] / 2) for p_ in mine]):
+                    plots_along(a0, a1, place)
+                for p_ in mine:
+                    project_building(p_, bmb, bcols)
             else:
                 xf = x1 if side == 'x1' else x0
                 ry = math.pi / 2 if side == 'x1' else -math.pi / 2
@@ -673,6 +744,8 @@ def build_refs():
     ref('refAutoStandInteractivePoint', (AUTO_STAND[0] + 1.5, 1.2, AUTO_STAND[1] + 1.0), collection=C_AREAS, parent=home)
     ref('refAutoParking', (AUTO_STAND[0] + 2.4, 0.9, AUTO_STAND[1] + 3.0), roty=-math.pi / 2, collection=C_AREAS, parent=home)
     ref('refHeroInteractivePoint', (HERO['x0'] + 1.2, 1.2, HERO['z0'] - 1.0), collection=C_AREAS, parent=home)
+    for p_ in PROJECT_PLOTS:   # refProjectAPoint .. refProjectJPoint, A = case 01
+        ref(f"refProject{p_['letter']}Point", p_['point'], collection=C_AREAS, parent=home)
     ref('refZoneBounding', (0, 0, 0), scale=(30, 30, 30), collection=C_AREAS, parent=home)
     return home
 
@@ -701,4 +774,5 @@ export(out('flowers/flowersReferences.glb'), list(C_FLOW.objects))
 export(out('areas/areas.glb'), [home])
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(HERE, 'world-of-somnath.blend'))
 json.dump({'trees': [list(t) for t in trees]}, open(os.path.join(HERE, 'atlas', 'world.json'), 'w'))
+json.dump([{'letter': p_['letter'], 'slug': p_['project']['slug'], 'cx': round(p_['cx'], 2), 'side': p_['side']} for p_ in PROJECT_PLOTS], open(os.path.join(HERE, 'atlas', 'project_plots.json'), 'w'), indent=1)
 print('BUILT', building_count[0], 'buildings,', len(scenery_objects), 'scenery objects,', len(trees), 'trees')
