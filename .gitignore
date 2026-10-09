@@ -7,3 +7,7 @@ dist
 .autosave
 .wav
 !static/sounds/music/*.wav
+# Large source music (mp3 versions are kept)
+static/sounds/musics/*.wav
+# Python caches
+__pycache__/
