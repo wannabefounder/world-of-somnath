@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/case/:slug", "destination": "/case/index.html" }
+    { "source": "/case/:slug", "destination": "/case" }
   ],
   "headers": [
     { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, immutable" }] }
