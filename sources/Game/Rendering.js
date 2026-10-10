@@ -40,7 +40,7 @@ export class Rendering
         this.renderer = new THREE.WebGPURenderer({
             canvas: this.game.canvasElement,
             powerPreference: 'high-performance',
-            forceWebGL: location.hash.match(/webgl/i) ? true : false,
+            forceWebGL: location.hash.match(/webgpu/i) ? false : true, // WebGL by default: the WebGPU path renders black on current Chrome (add #webgpu to try it)
             antialias: this.game.viewport.pixelRatio < 2
         })
         this.renderer.setSize(this.game.viewport.width, this.game.viewport.height)
